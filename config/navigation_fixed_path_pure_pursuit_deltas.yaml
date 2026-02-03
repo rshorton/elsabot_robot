@@ -1,0 +1,15 @@
+# This file contains deltas to be applied to the base navigation
+# config file for using the custom fixed-path planner with 
+# the stock RegulatedPurePursuitController controller.
+
+controller_server:
+  ros__parameters:
+    controller_plugins: ["RPP_FollowPath"]
+      
+planner_server:
+  ros__parameters:
+    GridBased:
+      plugin: "nav2_fixed_path_planner/FixedPath"
+      interpolation_resolution: 0.1
+      waypoints: "[[0.0, 0.0], [0.04, 2.79], [-0.16, 4.36], [0.38, 5.44], [3.0, 5.7], [3.9, 4.1], [2.9, 1.3], [2.9, -0.87], [3.2, -3.7], [3.7, -5.8], [3.2, -6.8], [2.2, -7.5], [1.13, -7.6], [0.09, -7.0], [0.05, -5.0], [0.5, -2.1]]"
+

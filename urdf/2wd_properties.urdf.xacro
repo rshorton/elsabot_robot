@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- x,y positions are relative to the center of the robot -->
+
+  <xacro:property name="base_length" value="0.525" />
+  <xacro:property name="base_width" value="0.483" />
+  <xacro:property name="base_height" value="0.365" />
+  <xacro:property name="base_mass" value="10" />
+
+  <xacro:property name="wheel_base" value="0.368" />
+  <xacro:property name="wheel_radius" value="0.08" />
+  <xacro:property name="wheel_width" value="0.047" />
+  <xacro:property name="wheel_pos_x_front" value="0.177" />
+  <xacro:property name="wheel_pos_x_rear" value="0.193" />
+  <xacro:property name="wheel_pos_y" value="0.218" />
+  <xacro:property name="wheel_pos_z" value="-0.115" />
+  <xacro:property name="wheel_mass" value="0.6" />
+  <xacro:property name="wheel_torque" value="12" />
+  <xacro:property name="wheel_max_steer" value="0.52" />
+  <xacro:property name="wheel_mass_steering" value=".1" />
+  <xacro:property name="kingpin_width" value="0.333" />
+  <xacro:property name="wheel_center_to_kingpin" value="0.05" />
+
+  <!-- base_link_*_offset_to_center is used to move the base link x,z
+       origin to the rear axle center when using ackermann steering. -->
+  <xacro:property name="base_link_x_offset_to_center" value="${wheel_pos_x_rear}" />
+  <xacro:property name="base_link_z_offset_to_center" value="${-1*wheel_pos_z}" />
+
+  <xacro:property name="laser_pose">
+    <origin xyz="${0.205 + base_link_x_offset_to_center} 0 ${0.092 + base_link_z_offset_to_center}" rpy="0 0 3.14"/>
+  </xacro:property>
+
+  <xacro:property name="imu_pose">
+    <origin xyz="${0.020 + base_link_x_offset_to_center} 0.0 ${0.220 + base_link_z_offset_to_center}" rpy="0 0 0"/>
+  </xacro:property>
+
+  <xacro:property name="gps_pose">
+    <origin xyz="${-0.195 + base_link_x_offset_to_center} 0.0 ${0.685 + base_link_z_offset_to_center}" rpy="0 0 0" /> 
+  </xacro:property>
+
+  <xacro:property name="depth_sensor_pose">
+    <origin xyz="${-0.030  + base_link_x_offset_to_center} 0 ${0.535 + base_link_z_offset_to_center}" rpy="0 0 0"/>
+  </xacro:property>
+</robot>

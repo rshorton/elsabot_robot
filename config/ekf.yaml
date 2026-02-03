@@ -1,0 +1,36 @@
+# Useful documentation:
+# http://docs.ros.org/en/melodic/api/robot_localization/html/state_estimation_nodes.html
+# https://vimeo.com/142624091
+
+ekf_filter_node:
+    ros__parameters:
+        frequency: 20.0
+        two_d_mode: true
+        publish_tf: true
+ 
+        map_frame: map             
+        odom_frame: odom            
+        base_link_frame: base_footprint 
+        world_frame: odom 
+
+        #x     , y     , z,
+        #roll  , pitch , yaw,
+        #vx    , vy    , vz,
+        #vroll , vpitch, vyaw,
+        #ax    , ay    , az
+
+        # From ebot base uC
+        odom0: ebot/odom
+        odom0_config: [false, false, false,
+                       false, false, false,
+                       true, true, false,
+                       false, false, true,
+                       false, false, false]
+
+        # From imu_filter_madgwick
+        imu0: imu/data
+        imu0_config: [false, false, false,
+                      false, false, false,
+                      false, false, false,
+                      false, false, true,
+                      false, false, false]

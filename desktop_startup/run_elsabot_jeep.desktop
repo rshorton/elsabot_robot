@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Name=Elsabot Robot Bringup
+Type=Application
+Exec=gnome-terminal -e "bash -c '/home/ubuntu/robot_ws/src/elsabot_robot/desktop_startup/run_robot.sh -b;$SHELL'" 
+Terminal=false
+StartupNotify=true
+

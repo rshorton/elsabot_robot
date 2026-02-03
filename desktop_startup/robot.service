@@ -1,0 +1,9 @@
+[Unit]
+Description=My custom startup script
+
+[Service]
+User=ubuntu
+ExecStart=/home/ubuntu/robot_ws/src/elsabot_robot/desktop_startup/startup.sh start
+
+[Install]
+WantedBy=multi-user.target
