@@ -123,7 +123,7 @@
     kingpin_width = "${kingpin_width}"
     wheel_radius = "${wheel_radius}"
     gz_odom_topic="/ebot/odom"
-    gz_cmd_vel_topic="cmd_vel"
+    gz_cmd_vel_topic="/cmd_vel/muxed"
 
   />
 

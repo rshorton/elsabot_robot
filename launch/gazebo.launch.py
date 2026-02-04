@@ -154,6 +154,9 @@ def generate_launch_description():
             executable='command_timeout',
             name='command_timeout_node',
             output='screen',
+            remappings=[
+                ('cmd_vel', 'cmd_vel/muxed')
+            ]
         ),
 
         # Used to simulate cmd_vel filtering for drive control mode

@@ -6,7 +6,7 @@
   <xacro:property name="base_length" value="0.525" />
   <xacro:property name="base_width" value="0.483" />
   <xacro:property name="base_height" value="0.365" />
-  <xacro:property name="base_mass" value="10" />
+  <xacro:property name="base_mass" value="18" />
 
   <xacro:property name="wheel_base" value="0.368" />
   <xacro:property name="wheel_radius" value="0.08" />

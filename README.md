@@ -106,25 +106,31 @@ ros2 run nav2_map_server map_saver_cli -f <path_to/elsabot_robot/maps/your_map_n
 
 ### Start base functionality using shell 1:
 ```
-   export GZ_SIM_RESOURCE_PATH=<path_to workspace/src>
-   ros2 launch elsabot_robot gazebo.launch.py
+elsabot_docker/run_ros_docker.sh
+ros2 launch elsabot_robot bringup.launch.py use_gazebo:=True
 ```
-### Start navigation using shell 2:
+
+### Start Gazebo using shell 2:
+
 ```
+elsabot_docker/open_shell.sh
+export GZ_SIM_RESOURCE_PATH=<path_to workspace/src>; ros2 launch elsabot_robot gazebo.launch.py
+```
+
+### Start navigation using shell 3:
+```
+elsabot_docker/open_shell.sh
 ros2 launch elsabot_robot navigation.launch.py use_sim_time:=True
 ```
-### Start RVIZ on development host  
+### Start Foxglove/RVIZ2
 
-```
-rviz2
-```
-
-* Use RViz to set the 2D pose estimate.
+Use Foxglove/RViz to set the 2D pose estimate and then issue navigation goals.
 
 To run Gazebo with simulated GPS instead of AMCL, revise the launch commands:
 
 ```
 ros2 launch elsabot_robot bringup.launch.py use_gazebo:=True launch_gazebo:=True use_gps:=True gps_origin_lat:=<replace with your lat> gps_origin_lon:=<replace with your long> world_sdf_file:=my_empty_world.sdf
+
 ros2 launch elsabot_robot navigation.launch.py use_sim_time:=True use_gps:=True
 ```   
 

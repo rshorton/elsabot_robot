@@ -47,9 +47,9 @@ from launch_ros.actions import PushRosNamespace
 from launch_ros.substitutions import FindPackageShare
 
 #change to the name of your own map here or specify map via param
-MAP_NAME='office_012627'
-#MAP_NAME='upstairs_1111'
+#MAP_NAME='office_012627'
 #MAP_NAME='backyard'
+MAP_NAME='gazebo_backyard'
 #MAP_NAME='backyard_simple'
 #MAP_NAME='downstairs'
 
@@ -91,6 +91,7 @@ def generate_launch_description():
         logger = logging.get_logger('launch.user')
         use_gps = context.launch_configurations['use_gps']
         nav2_beh_mode = context.launch_configurations['nav2_behavior_mode']
+        use_sim_time = context.launch_configurations['use_sim_time']
 
         logger.info('prepare_nav_launch: use_gps: {}, nav2_beh_mode: {}'.format(use_gps, nav2_beh_mode))
 
@@ -132,7 +133,8 @@ def generate_launch_description():
         param_substitutions = {
             'default_nav_through_poses_bt_xml': nav_through_poses_bt_xml,
             'default_nav_to_pose_bt_xml': nav_to_pose_bt_xml,
-            'yaml_filename': default_map_path
+            'yaml_filename': default_map_path,
+            'use_sim_time': use_sim_time
         }
 
         logger.debug("Using BTs: {}".format(str(param_substitutions)))
@@ -151,6 +153,8 @@ def generate_launch_description():
             logger.info(f.read())
 
         descriptions = [
+            SetParameter(name='use_sim_time', value=LaunchConfiguration('use_sim_time')),
+
             GroupAction([
                 PushRosNamespace(
                     condition=IfCondition(use_namespace),
