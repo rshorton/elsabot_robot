@@ -97,31 +97,7 @@ def generate_launch_description():
 
         # Combine base Nav yaml file with other deltas as needed
         nav_yaml = nav2_config_path_base
-        yaml_to_merge = ""
 
-        # Fix - support gps and fixed-path mode => base + gps changes + fixed-path mode changes
-        if use_gps == 'True':
-            yaml_to_merge = nav2_config_path_gps_deltas
-
-        elif nav2_beh_mode == 'nav_fixed_path_with_pure_pursuit':
-            yaml_to_merge = nav2_config_path_fixed_path_pure_pursuit_deltas
-
-        if yaml_to_merge:
-            logger.info("Merging nav config {}". format(yaml_to_merge))
-            nav_yaml_tmp = tempfile.NamedTemporaryFile(mode='w', delete=False)
-            process = subprocess.run("yq eval-all '. as $item ireduce ({}; . * $item)' " +
-                                     nav2_config_path_base + " " + yaml_to_merge +
-                                     ">" + nav_yaml_tmp.name,
-                                      shell=True, capture_output=True)
-            if process.returncode:
-                 raise Exception("Failed to merge nav2 config for gps")
-
-            nav_yaml = nav_yaml_tmp.name
-
-        logger.debug("prepared nav yaml:\n")
-        with open(nav_yaml, 'r') as f:
-            logger.debug(f.read())
-       
         # Determine the Nav2 BT tree to use based on the specified nav mode.
         nav_through_poses_bt_xml = nav2_bt_through_poses_xml_path
 
@@ -147,8 +123,40 @@ def generate_launch_description():
             convert_types=True)
             
         nav2_config_file = rewritten_yaml.perform(context)
+
+        # Include additional overriding parameters in the order they should
+        # be layered over the defaults
+        append_files = []
+        if use_gps == 'True':
+            append_files.append(nav2_config_path_gps_deltas)
+
+        if nav2_beh_mode == 'nav_fixed_path_with_pure_pursuit':
+            append_files.append(nav2_config_path_fixed_path_pure_pursuit_deltas)
+
+        if len(append_files) != 0:
+            for file_path in append_files:
+                logger.info(f"Appending cfg file to base nav file: {file_path}")
+                append_data = ""
+                try:
+                    with open(file_path, 'r') as f:
+                        append_data = f.read()
+                except FileNotFoundError as e:
+                    print(f"Error: {e}. Cannot read cfg file to merge.")
+                except Exception as e:
+                    print(f"An error occurred: {e}")
+
+                try:
+                    with open(nav2_config_file, 'a') as f:
+                        f.write(append_data)
+
+                except FileNotFoundError as e:
+                    print(f"Error: {e}. Cannot open nav2 config file to append cfg data")
+                except Exception as e:
+                    print(f"An error occurred: {e}")
+
+        
         # Dump the config to check it
-        logger.debug("complete nav yaml:\n")
+        logger.info("Merged nav yaml:\n")
         with open(nav2_config_file, 'r') as f:
             logger.info(f.read())
 
