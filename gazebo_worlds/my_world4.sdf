@@ -17,7 +17,7 @@
       <latitude_deg>REPLACE_LATITUDE</latitude_deg>
       <longitude_deg>REPLACE_LONGITUDE</longitude_deg>
       <elevation>0</elevation>
-      <heading_deg>0</heading_deg>
+      <heading_deg>90.0</heading_deg>
     </spherical_coordinates>
 
 
