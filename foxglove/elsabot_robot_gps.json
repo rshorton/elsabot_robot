@@ -1,0 +1,470 @@
+{
+  "configById": {
+    "map!4ff2xvp": {
+      "zoomLevel": 20,
+      "customTileUrl": "",
+      "disabledTopics": [],
+      "followTopic": "",
+      "followFrame": "",
+      "layer": "satellite",
+      "topicColors": {},
+      "maxNativeZoom": 18,
+      "topicConfig": {
+        "/gps/filtered": {
+          "pointDisplayMode": "dot",
+          "historyMode": "none",
+          "pointSize": 6
+        },
+        "/gps/fix": {
+          "pointDisplayMode": "dot",
+          "historyMode": "none",
+          "pointSize": 6
+        }
+      },
+      "layers": []
+    },
+    "Plot!33t2dmx": {
+      "paths": [
+        {
+          "value": "/odometry/global.pose.pose.position.y",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "showLine": true
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/global.pose.pose.position.x",
+          "enabled": true,
+          "color": "#f5774d",
+          "id": "ad56ecf1-2351-4d3c-8367-e89026b353fa"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/local.pose.pose.position.x",
+          "enabled": true,
+          "color": "#f7df71",
+          "id": "1c6a67db-6782-4a0a-b7d5-20fc0e9d3f78"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/local.pose.pose.position.y",
+          "enabled": true,
+          "color": "#5cd6a9",
+          "id": "f01d37d7-a1c6-4092-9e24-c0feabf67700"
+        }
+      ],
+      "showLegend": false,
+      "showPlotValuesInLegend": false
+    },
+    "3D!18i6zy7": {
+      "layers": {
+        "845139cb-26bc-40b3-8161-8ab60af4baf5": {
+          "visible": true,
+          "frameLocked": true,
+          "label": "Grid",
+          "instanceId": "845139cb-26bc-40b3-8161-8ab60af4baf5",
+          "layerId": "foxglove.Grid",
+          "size": 10,
+          "divisions": 10,
+          "lineWidth": 1,
+          "color": "#248eff",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "order": 1
+        }
+      },
+      "cameraState": {
+        "perspective": false,
+        "distance": 14.701837812493006,
+        "phi": 62.676584015883535,
+        "thetaOffset": 90.01882621382967,
+        "targetOffset": [
+          -0.4267745323658291,
+          0.34455842545655724,
+          2.1189570341547774e-17
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-none",
+      "scene": {
+        "transforms": {
+          "visible": true,
+          "showLabel": true,
+          "labelSize": 0.02
+        },
+        "meshUpAxis": "z_up",
+        "ignoreColladaUpAxis": true
+      },
+      "transforms": {
+        "frame:imu_link": {
+          "visible": true
+        },
+        "frame:odom": {
+          "visible": true
+        },
+        "frame:base_link": {
+          "visible": true
+        },
+        "frame:cam_pan_to_tilt_link": {
+          "visible": true
+        },
+        "frame:base_footprint": {
+          "visible": true
+        },
+        "frame:laser": {
+          "visible": true
+        }
+      },
+      "topics": {
+        "/scan": {
+          "visible": true,
+          "colorField": "range",
+          "colorMode": "colormap",
+          "colorMap": "turbo",
+          "pointSize": 4
+        },
+        "/scan_filtered": {
+          "visible": true,
+          "colorField": "intensity",
+          "colorMode": "colormap",
+          "colorMap": "turbo",
+          "pointSize": 4
+        },
+        "/amcl_pose": {
+          "visible": true
+        },
+        "/set_pose": {
+          "visible": true
+        },
+        "/goal_pose": {
+          "visible": true,
+          "type": "arrow"
+        },
+        "/map": {
+          "visible": true
+        },
+        "/move_base_simple/goal": {
+          "visible": true
+        },
+        "/global_costmap/costmap": {
+          "visible": false
+        },
+        "/local_costmap/costmap": {
+          "visible": true,
+          "colorMode": "costmap",
+          "alpha": 0.5
+        },
+        "/global_costmap/obstacle_layer": {
+          "visible": false
+        },
+        "/global_costmap/static_layer": {
+          "visible": false
+        },
+        "/local_costmap/published_footprint": {
+          "visible": true
+        },
+        "/robot_description": {
+          "visible": true,
+          "displayMode": "visual",
+          "showAxis": false
+        },
+        "/global_costmap/published_footprint": {
+          "visible": false
+        },
+        "/docking_trajectory": {
+          "visible": false
+        },
+        "/lookahead_collision_arc": {
+          "visible": true
+        },
+        "/plan_smoothed": {
+          "visible": true
+        },
+        "/unsmoothed_plan": {
+          "visible": true
+        },
+        "/goal_update": {
+          "visible": true
+        },
+        "/teb_poses": {
+          "visible": true
+        },
+        "/teb_markers": {
+          "visible": false
+        },
+        "/route_graph": {
+          "visible": false
+        },
+        "/global_plan": {
+          "visible": true
+        }
+      },
+      "publish": {
+        "type": "pose",
+        "poseTopic": "/goal_pose",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {},
+      "followTf": "map",
+      "fixedFrame": "map",
+      "locationFixTopic": "/gps/filtered",
+      "enuFrameId": "map"
+    },
+    "RosOut!2go6q1o": {
+      "minLogLevel": 1,
+      "preload": true,
+      "searchTerms": [],
+      "nameFilter": {},
+      "fontSize": 12
+    },
+    "RawMessages!os6rgs": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/odometry/gps",
+      "fontSize": 12,
+      "expansion": {
+        "header": "c",
+        "stamp~header": "e",
+        "pose": "e",
+        "pose~pose": "e",
+        "position~pose~pose": "e",
+        "orientation~pose~pose": "e",
+        "covariance~pose": "e",
+        "twist": "e",
+        "twist~twist": "e",
+        "linear~twist~twist": "e",
+        "angular~twist~twist": "e",
+        "covariance~twist": "e"
+      }
+    },
+    "RawMessages!47tej8o": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/odometry/global",
+      "fontSize": 12,
+      "expansion": {
+        "header": "c",
+        "stamp~header": "e",
+        "pose": "e",
+        "pose~pose": "e",
+        "position~pose~pose": "e",
+        "orientation~pose~pose": "e",
+        "covariance~pose": "e",
+        "twist": "e",
+        "twist~twist": "e",
+        "linear~twist~twist": "e",
+        "angular~twist~twist": "e",
+        "covariance~twist": "e"
+      }
+    },
+    "RawMessages!49vfj4w": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/odometry/local",
+      "fontSize": 12,
+      "expansion": {
+        "header": "c",
+        "stamp~header": "e",
+        "pose": "e",
+        "pose~pose": "e",
+        "position~pose~pose": "e",
+        "orientation~pose~pose": "e",
+        "covariance~pose": "e",
+        "twist": "e",
+        "twist~twist": "e",
+        "linear~twist~twist": "e",
+        "angular~twist~twist": "e",
+        "covariance~twist": "e"
+      }
+    },
+    "RawMessages!1ayws0r": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/ebot/odom",
+      "fontSize": 12,
+      "expansion": {
+        "header": "c",
+        "stamp~header": "e",
+        "pose": "e",
+        "pose~pose": "e",
+        "position~pose~pose": "e",
+        "orientation~pose~pose": "e",
+        "covariance~pose": "e",
+        "twist": "e",
+        "twist~twist": "e",
+        "linear~twist~twist": "e",
+        "angular~twist~twist": "e",
+        "covariance~twist": "e"
+      }
+    },
+    "RawMessages!zv4v3r": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/gps/filtered",
+      "fontSize": 12,
+      "expansion": {
+        "header": "c",
+        "stamp~header": "e",
+        "status": "e",
+        "position_covariance": "e"
+      }
+    },
+    "RawMessages!378zbhd": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/gps/fix",
+      "fontSize": 12,
+      "expansion": {
+        "header": "c",
+        "stamp~header": "e",
+        "status": "e",
+        "position_covariance": "e"
+      }
+    },
+    "RawMessages!4ffp2sd": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/ebot/imu/mag",
+      "fontSize": 12
+    },
+    "RawMessages!3rqnwaa": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/ebot/imu/data",
+      "fontSize": 12,
+      "expansion": {
+        "header": "c",
+        "stamp~header": "e",
+        "orientation": "e",
+        "orientation_covariance": "e",
+        "angular_velocity": "e",
+        "angular_velocity_covariance": "e",
+        "linear_acceleration": "e",
+        "linear_acceleration_covariance": "e"
+      }
+    },
+    "RawMessages!1tsteb5": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/imu/data",
+      "fontSize": 12,
+      "expansion": {
+        "header": "c",
+        "stamp~header": "e",
+        "orientation": "e",
+        "orientation_covariance": "e",
+        "angular_velocity": "e",
+        "angular_velocity_covariance": "e",
+        "linear_acceleration": "e",
+        "linear_acceleration_covariance": "e"
+      }
+    }
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "drawerConfig": {
+    "tracks": []
+  },
+  "layout": {
+    "direction": "row",
+    "first": {
+      "first": "map!4ff2xvp",
+      "second": "Plot!33t2dmx",
+      "direction": "column"
+    },
+    "second": {
+      "first": {
+        "first": "3D!18i6zy7",
+        "second": "RosOut!2go6q1o",
+        "direction": "column",
+        "splitPercentage": 78.44187629653334
+      },
+      "second": {
+        "first": {
+          "first": {
+            "first": {
+              "first": "RawMessages!os6rgs",
+              "second": "RawMessages!47tej8o",
+              "direction": "row"
+            },
+            "second": "RawMessages!49vfj4w",
+            "direction": "row",
+            "splitPercentage": 68.11107903427029
+          },
+          "second": "RawMessages!1ayws0r",
+          "direction": "row",
+          "splitPercentage": 75.68987169899322
+        },
+        "second": {
+          "first": {
+            "first": "RawMessages!zv4v3r",
+            "second": "RawMessages!378zbhd",
+            "direction": "row"
+          },
+          "second": {
+            "first": "RawMessages!4ffp2sd",
+            "second": {
+              "first": "RawMessages!3rqnwaa",
+              "second": "RawMessages!1tsteb5",
+              "direction": "row"
+            },
+            "direction": "row"
+          },
+          "direction": "column",
+          "splitPercentage": 36.135560655253215
+        },
+        "direction": "column",
+        "splitPercentage": 33.18723778127192
+      },
+      "direction": "row",
+      "splitPercentage": 37.05532914119088
+    },
+    "splitPercentage": 23.460000320093467
+  }
+}
