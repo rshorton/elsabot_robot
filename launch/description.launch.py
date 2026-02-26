@@ -61,6 +61,13 @@ def generate_launch_description():
             description='Use simulation time'
         ),
 
+        DeclareLaunchArgument(
+            name='log_level',
+            default_value='info',
+            description='Log level'
+        ),
+
+
         Node(
             package='joint_state_publisher',
             executable='joint_state_publisher',
@@ -78,7 +85,9 @@ def generate_launch_description():
                     'use_sim_time': LaunchConfiguration('use_sim_time'),
                     'robot_description': Command(['xacro ', LaunchConfiguration('urdf')])
                 }
-            ]
+            ],
+            arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')],
+
         ),
         
         Node(
