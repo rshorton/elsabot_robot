@@ -226,7 +226,7 @@ local_costmap:
       #robot_radius: 0.28
       footprint: "[ [0.177, 0.218], [0.177, -0.218], [-0.177, -0.218], [-0.177, 0.218] ]"
 
-      plugins: ["voxel_layer", "inflation_layer"]
+      plugins: ["voxel_layer", "range_layer", "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 2.0 
@@ -234,11 +234,12 @@ local_costmap:
       range_layer:
         plugin: "nav2_costmap_2d::RangeSensorLayer"
         enabled: True
-        topics: ["/range/back_left", "/range/back_right"]
+        topics: ["/ebot/range/back", "/ebot/range/front"]
         clear_on_max_reading: True
         input_sensor_type: "All"
-        mark_threshold: 0.6
-        clear_threshold: 0.5
+        mark_threshold: 0.8
+        clear_threshold: 0.2
+        no_readings_timeout: 5.0
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"
         enabled: True

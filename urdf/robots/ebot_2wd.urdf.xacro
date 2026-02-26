@@ -9,8 +9,10 @@
   <xacro:include filename="$(find elsabot_robot)/urdf/sensors/gps.urdf.xacro" />
   <xacro:include filename="$(find elsabot_robot)/urdf/sensors/generic_laser.urdf.xacro" />
   <xacro:include filename="$(find elsabot_robot)/urdf/sensors/oakd_on_ptbase.urdf.xacro" />
-  <xacro:include filename="$(find elsabot_robot)/urdf/controllers/ackermann_drive.urdf.xacro" />  
-
+  <xacro:include filename="$(find elsabot_robot)/urdf/controllers/ackermann_drive.urdf.xacro" />
+  <xacro:include filename="$(find elsabot_robot)/urdf/sensors/hcsr04.urdf.xacro" />
+  <xacro:include filename="$(find elsabot_robot)/urdf/sensors/hcsr04_servo_pan_mount.xacro" />
+  
   <xacro:base 
     length="${base_length}" 
     width="${base_width}" 
@@ -105,6 +107,32 @@
   <xacro:depth_sensor>
     <xacro:insert_block name="depth_sensor_pose" />
   </xacro:depth_sensor>
+
+  <xacro:hcsr04_servo_pan_mount
+    frame_id="hcsr04_pan_joint_front"
+    parent_link="base_link"
+    child_link="hcsr04_front_servo_pan_link">
+    <xacro:insert_block name="hcsr04_range_front_servo_pose" />
+  </xacro:hcsr04_servo_pan_mount>
+
+  <xacro:hcsr04_sensor
+    frame_id="hcsr04_front"
+    parent_link="hcsr04_front_servo_pan_link">
+    <xacro:insert_block name="hcsr04_range_front_pose" />
+  </xacro:hcsr04_sensor>
+
+  <xacro:hcsr04_servo_pan_mount
+    frame_id="hcsr04_pan_joint_back"
+    parent_link="base_link"
+    child_link="hcsr04_back_servo_pan_link">
+    <xacro:insert_block name="hcsr04_range_back_servo_pose" />
+  </xacro:hcsr04_servo_pan_mount>
+
+  <xacro:hcsr04_sensor
+    frame_id="hcsr04_back"
+    parent_link="hcsr04_back_servo_pan_link">
+    <xacro:insert_block name="hcsr04_range_back_pose" />
+  </xacro:hcsr04_sensor>
 
   <gazebo>
     <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher"/>

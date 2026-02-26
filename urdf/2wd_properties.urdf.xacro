@@ -42,4 +42,21 @@
   <xacro:property name="depth_sensor_pose">
     <origin xyz="${-0.030  + base_link_x_offset_to_center} 0 ${0.535 + base_link_z_offset_to_center}" rpy="0 0 0"/>
   </xacro:property>
+
+  <xacro:property name="hcsr04_range_front_servo_pose">
+    <origin xyz="${0.245 + base_link_x_offset_to_center} 0.0 ${-0.070 + base_link_z_offset_to_center}" rpy="0 0 0"/>
+  </xacro:property>
+
+  <xacro:property name="hcsr04_range_front_pose">
+    <origin xyz="0.010 0.0 0.0" rpy="0 0 0"/>
+  </xacro:property>
+
+  <xacro:property name="hcsr04_range_back_servo_pose">
+    <origin xyz="${-0.254 + base_link_x_offset_to_center} 0.053 ${-0.070 + base_link_z_offset_to_center}" rpy="0 0 -3.14"/>
+  </xacro:property>
+
+  <xacro:property name="hcsr04_range_back_pose">
+    <origin xyz="-0.020 0.0 0.0" rpy="0 0 0"/>
+  </xacro:property>
+
 </robot>

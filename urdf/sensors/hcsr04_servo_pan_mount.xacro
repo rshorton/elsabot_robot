@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+  <xacro:macro name="hcsr04_servo_pan_mount" params="*origin frame_id parent_link child_link">
+
+    <link name="${child_link}" />
+
+    <joint name="${frame_id}" type="revolute">
+      <xacro:insert_block name="origin" />
+      <axis xyz="0 0 1"/>
+      <limit upper="2.09" lower="-2.09" effort="10" velocity="10"/>
+      <parent link="${parent_link}" />
+      <child link="${child_link}" />
+    </joint>
+  </xacro:macro>
+</robot>

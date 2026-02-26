@@ -1,6 +1,6 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:property name="M_PI" value="3.1415926535897931" />
-    <xacro:macro name="hcsr04_sensor" params="*origin frame_id">
+    <xacro:macro name="hcsr04_sensor" params="*origin frame_id parent_link">
       <link name="${frame_id}">
         <inertial>
           <mass value="0.01" />
@@ -17,7 +17,7 @@
 
       <joint name="${frame_id}_joint" type="fixed">
         <xacro:insert_block name="origin" />
-        <parent link="base_link" />
+        <parent link="${parent_link}" />
         <child link="${frame_id}"/>
       </joint>
     </xacro:macro>      
