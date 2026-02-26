@@ -228,7 +228,7 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(description_launch_path),
             launch_arguments={
                 'use_sim_time': LaunchConfiguration('use_gazebo'),
-                'publish_joints': 'true',
+                'publish_joints': 'false',
                 'robot_base': LaunchConfiguration('robot_base'),
                 'urdf': PathJoinSubstitution(
                     [FindPackageShare("elsabot_robot"), "urdf/robots",  'ebot_2wd' + f".urdf.xacro"])
