@@ -28,7 +28,7 @@
   <xacro:property name="base_link_z_offset_to_center" value="${-1*wheel_pos_z}" />
 
   <xacro:property name="laser_pose">
-    <origin xyz="${0.205 + base_link_x_offset_to_center} 0 ${0.092 + base_link_z_offset_to_center}" rpy="0 0 3.14"/>
+    <origin xyz="${-0.01 + base_link_x_offset_to_center} 0 ${0.35 + base_link_z_offset_to_center}" rpy="0 0 3.14"/>
   </xacro:property>
 
   <xacro:property name="imu_pose">
