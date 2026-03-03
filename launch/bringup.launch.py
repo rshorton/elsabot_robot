@@ -262,6 +262,13 @@ def generate_launch_description():
             parameters=[cmd_vel_mux_config]
         ),
 
+        Node(
+            package='ina226_power_monitor',
+            executable='ina226_power_monitor',
+            output='screen',
+            parameters=[{'cal_value': 367, 'current_lsb': 0.0002}]
+        ),
+
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(get_package_share_directory('elsabot_robot'), 'launch', 'navigation.launch.py')),
