@@ -1,0 +1,2 @@
+# Silicon Laboratories CP2112 HID USB-to-SMBus Bridge
+SUBSYSTEM=="i2c-dev", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea90", SYMLINK+="i2c-20", MODE="0666", GROUP="i2c"
