@@ -47,9 +47,9 @@ from launch_ros.actions import PushRosNamespace
 from launch_ros.substitutions import FindPackageShare
 
 #change to the name of your own map here or specify map via param
-#MAP_NAME='office_012627'
+MAP_NAME='office_022726'
 #MAP_NAME='backyard'
-MAP_NAME='gazebo_backyard'
+#MAP_NAME='gazebo_backyard'
 #MAP_NAME='backyard_simple'
 #MAP_NAME='downstairs'
 
