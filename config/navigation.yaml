@@ -224,7 +224,7 @@ local_costmap:
       
       # Fix - make conditional based on robot base
       #robot_radius: 0.28
-      footprint: "[ [0.177, 0.218], [0.177, -0.218], [-0.177, -0.218], [-0.177, 0.218] ]"
+      footprint: "[ [0.460, 0.218], [0.460, -0.218], [-0.100, -0.218], [-0.100, 0.218] ]"
 
       plugins: ["voxel_layer", "range_layer", "inflation_layer"]
       inflation_layer:
