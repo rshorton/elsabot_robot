@@ -29,6 +29,8 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression, PathJoinSubstitution, EnvironmentVariable
+from launch_xml.launch_description_sources import XMLLaunchDescriptionSource
+
 
 MAP_NAME='upstairs3'
 #MAP_NAME='backyard'
@@ -195,11 +197,11 @@ def generate_launch_description():
             description='Run rviz'
         ),
 
-        #DeclareLaunchArgument(
-        #    name='use_rosbridge', 
-        #    default_value='True',
-        #    description='Set to True launch ROS bridge'
-        #),
+        DeclareLaunchArgument(
+            name='use_rosbridge', 
+            default_value='True',
+            description='Set to True launch ROS bridge'
+        ),
 
         SetParameter(name='use_sim_time', value=LaunchConfiguration('use_gazebo')),
 
@@ -320,7 +322,8 @@ def generate_launch_description():
         ),
 
         # web bridge (for proxying topics/actions to/from ros_web based applications)
-        #IncludeLaunchDescription(
-        #    XMLLaunchDescriptionSource(rosbridge_launch_path),
-        #    condition=IfCondition(LaunchConfiguration('use_rosbridge'))
+        IncludeLaunchDescription(
+            XMLLaunchDescriptionSource(rosbridge_launch_path),
+            condition=IfCondition(LaunchConfiguration('use_rosbridge'))
+        )
     ])
