@@ -104,7 +104,7 @@ def generate_launch_description():
 
         DeclareLaunchArgument(
             name='use_filter', 
-            default_value='True',
+            default_value='False',
             description='True to use scan filter.'
         ),
 

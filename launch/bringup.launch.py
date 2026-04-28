@@ -25,7 +25,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node, SetParameter
 from launch_ros.substitutions import FindPackageShare
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression, PathJoinSubstitution, EnvironmentVariable
@@ -93,6 +93,12 @@ def generate_launch_description():
             name='robot_base', 
             default_value='ebot_2wd',
             description='Elsabot robot base variant to use.'
+        ),
+
+        DeclareLaunchArgument(
+            name='differential_steering', 
+            default_value='False',
+            description='Set to True to use differential steering instead of ackermann (either mode can be configured on the robot)'
         ),
 
         DeclareLaunchArgument(
@@ -226,16 +232,41 @@ def generate_launch_description():
         ),
 
         # Robot description
+        # Is there a way to configure the urdf path using a launch config variable to avoid
+        # to cases here?
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(description_launch_path),
+            condition=UnlessCondition(LaunchConfiguration('differential_steering')),
             launch_arguments={
                 'use_sim_time': LaunchConfiguration('use_gazebo'),
                 'publish_joints': 'false',
                 'robot_base': LaunchConfiguration('robot_base'),
                 'urdf': PathJoinSubstitution(
-                    [FindPackageShare("elsabot_robot"), "urdf/robots",  'ebot_2wd' + f".urdf.xacro"])
-                    #[FindPackageShare("elsabot_robot"), "urdf/robots",  LaunchConfiguration('robot_base') + f".urdf.xacro"])
+                    [FindPackageShare("elsabot_robot"), "urdf/robots",  'ebot_2wd_ackermann' + f".urdf.xacro"])
             }.items()
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(description_launch_path),
+            condition=IfCondition(LaunchConfiguration('differential_steering')),
+            launch_arguments={
+                'use_sim_time': LaunchConfiguration('use_gazebo'),
+                'publish_joints': 'false',
+                'robot_base': LaunchConfiguration('robot_base'),
+                'urdf': PathJoinSubstitution(
+                    [FindPackageShare("elsabot_robot"), "urdf/robots",  'ebot_2wd_differential' + f".urdf.xacro"])
+            }.items()
+        ),
+
+        # Configure the base controller which steering mode to use
+        ExecuteProcess(
+            condition=IfCondition(LaunchConfiguration('differential_steering')),
+            cmd=['ros2', 'topic', 'pub', '-1', '/ebot/enable_ackermann', 'std_msgs/msg/Bool', 'data: false'],
+            output='screen'
+        ),
+        ExecuteProcess(
+            condition=UnlessCondition(LaunchConfiguration('differential_steering')),
+            cmd=['ros2', 'topic', 'pub', '-1', '/ebot/enable_ackermann', 'std_msgs/msg/Bool', 'data: true'],
+            output='screen'
         ),
 
         IncludeLaunchDescription(
@@ -278,11 +309,11 @@ def generate_launch_description():
             launch_arguments={
                 'use_sim_time': LaunchConfiguration('use_gazebo'),
                 'map': LaunchConfiguration('map'),
-                'use_keep_out': LaunchConfiguration("use_keep_out"),
-                'keep_out_map': LaunchConfiguration("keep_out_map"),
+                'use_keep_out': LaunchConfiguration('use_keep_out'),
+                'keep_out_map': LaunchConfiguration('keep_out_map'),
                 'slam': LaunchConfiguration('slam'),
-                'use_gps': LaunchConfiguration('use_gps')
-
+                'use_gps': LaunchConfiguration('use_gps'),
+                'differential_steering': LaunchConfiguration('differential_steering')
             }.items()
         ),
 

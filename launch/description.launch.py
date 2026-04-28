@@ -28,7 +28,7 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
 
     urdf_path = PathJoinSubstitution(
-        [FindPackageShare("elsabot_robot"), "urdf/robots", f"ebot_2wd.urdf.xacro"]
+        [FindPackageShare("elsabot_robot"), "urdf/robots", f"ebot_2wd_ackermann.urdf.xacro"]
     )
 
     rviz_config_path = PathJoinSubstitution(
@@ -66,7 +66,6 @@ def generate_launch_description():
             default_value='info',
             description='Log level'
         ),
-
 
         Node(
             package='joint_state_publisher',

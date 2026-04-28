@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<robot name="elsabot_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find elsabot_robot)/urdf/2wd_properties.urdf.xacro" />
+  <xacro:include filename="$(find elsabot_robot)/urdf/robots/ebot_2wd_common.urdf.xacro" />
+  
+  <xacro:include filename="$(find elsabot_robot)/urdf/mech/wheel.urdf.xacro" />
+  <xacro:include filename="$(find elsabot_robot)/urdf/mech/caster_wheel_alt.urdf.xacro" />
+  <xacro:include filename="$(find elsabot_robot)/urdf/controllers/diff_drive.urdf.xacro" />
+ 
+  <xacro:wheel 
+    parent_link="base_link" 
+    side="rear_left"
+    radius="${wheel_radius}" 
+    width="${wheel_width}" 
+    pos_x="${-wheel_pos_x_rear + base_link_x_offset_to_center}" 
+    pos_y="${wheel_pos_y}" 
+    pos_z="${wheel_pos_z + base_link_z_offset_to_center}" 
+    mass="${wheel_mass}"
+  />
+
+  <xacro:wheel 
+    parent_link="base_link" 
+    side="rear_right"
+    radius="${wheel_radius}" 
+    width="${wheel_width}" 
+    pos_x="${-wheel_pos_x_rear + base_link_x_offset_to_center}" 
+    pos_y="${-wheel_pos_y}" 
+    pos_z="${wheel_pos_z + base_link_z_offset_to_center}" 
+    mass="${wheel_mass}"
+  />
+
+  <xacro:caster_wheel_alt 
+    prefix="front"
+    suffix="left"
+    radius="${wheel_radius}"
+    pos_x="${wheel_pos_x_front + base_link_x_offset_to_center}" 
+    pos_y="${kingpin_width/2}" 
+    pos_z="${wheel_pos_z + base_link_z_offset_to_center}" 
+  />
+
+  <xacro:caster_wheel_alt 
+    prefix="front"
+    suffix="right"
+    radius="${wheel_radius}"
+    pos_x="${wheel_pos_x_front + base_link_x_offset_to_center}" 
+    pos_y="${-kingpin_width/2}" 
+    pos_z="${wheel_pos_z + base_link_z_offset_to_center}" 
+  />
+
+  <xacro:diff_drive_controller
+    wheel_separation="${wheel_pos_y * 2}"
+    wheel_radius="${wheel_radius}"
+    wheel_torque="${wheel_torque}"
+    gz_odom_topic="/ebot/odom"
+    gz_cmd_vel_topic="/cmd_vel/muxed"
+  />  
+
+</robot>

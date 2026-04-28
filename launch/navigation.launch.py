@@ -61,7 +61,8 @@ def generate_launch_description():
     default_keep_out_map_path = os.path.join(get_package_share_directory('elsabot_robot'), 'maps', f'{MAP_NAME}_keep_out.yaml')
 
     # Nav2 parameter file and delta files
-    nav2_config_path_base = os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'navigation.yaml')
+    nav2_config_path_base_differential = os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'navigation_differential.yaml')
+    nav2_config_path_base_ackermann = os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'navigation_ackermann.yaml')
     nav2_config_path_fixed_path_pure_pursuit_deltas = os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'navigation_fixed_path_pure_pursuit_deltas.yaml')
     nav2_config_path_gps_deltas = os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'navigation_gps_deltas.yaml')
 
@@ -78,6 +79,7 @@ def generate_launch_description():
     use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
     use_composition = LaunchConfiguration('use_composition')
+    differential_steering = LaunchConfiguration('differential_steering')
 
     nav2_launch_path = PathJoinSubstitution(
         [FindPackageShare('nav2_bringup'), 'launch', 'bringup_launch.py']
@@ -92,11 +94,19 @@ def generate_launch_description():
         use_gps = context.launch_configurations['use_gps']
         nav2_beh_mode = context.launch_configurations['nav2_behavior_mode']
         use_sim_time = context.launch_configurations['use_sim_time']
+        differential_steering = context.launch_configurations['differential_steering']
 
-        logger.info('prepare_nav_launch: use_gps: {}, nav2_beh_mode: {}'.format(use_gps, nav2_beh_mode))
+        logger.info('prepare_nav_launch: use_gps: {}, nav2_beh_mode: {}, differential_steering: {}'.format(use_gps,
+                     nav2_beh_mode, differential_steering))
 
         # Combine base Nav yaml file with other deltas as needed
-        nav_yaml = nav2_config_path_base
+
+        if differential_steering == 'True':
+            nav_yaml = nav2_config_path_base_differential
+        else:
+            nav_yaml = nav2_config_path_base_ackermann
+
+        #nav_yaml = nav2_config_path_base
 
         # Determine the Nav2 BT tree to use based on the specified nav mode.
         nav_through_poses_bt_xml = nav2_bt_through_poses_xml_path
@@ -241,6 +251,12 @@ def generate_launch_description():
 
 
     return LaunchDescription([
+        DeclareLaunchArgument(
+            name='differential_steering', 
+            default_value='False',
+            description='Set to True to use differential steering instead of ackermann (either mode can be configured on the robot)'
+        ),
+
         DeclareLaunchArgument(
             name='use_sim_time', 
             default_value='false',

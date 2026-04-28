@@ -80,7 +80,7 @@ controller_server:
   ros__parameters:
     odom_topic: /odometry/local
     use_sim_time: False
-    controller_frequency: 10.0 #20.0
+    controller_frequency: 8.0 #20.0
     progress_checker_plugins: ["progress_checker"]
     goal_checker_plugins: ["goal_checker"]
     controller_plugins: ["FollowPath"]
@@ -93,21 +93,116 @@ controller_server:
     goal_checker:
       stateful: True
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.4
-      yaw_goal_tolerance: 0.7
+      xy_goal_tolerance: 0.2
+      yaw_goal_tolerance: 0.2
+
+    FollowPath:
+      plugin: "nav2_mppi_controller::MPPIController"
+      time_steps: 56
+      model_dt: 0.125
+      batch_size: 2000
+      vx_std: 0.2
+      vy_std: 0.2
+      wz_std: 0.4
+      vx_max: 0.3
+      vx_min: -0.35
+      vy_max: 0.5
+      wz_max: 0.3
+      ax_max: 1.0
+      ax_min: -3.0
+      ay_min: -3.0
+      ay_max: 3.0
+      az_max: 1.5
+      iteration_count: 1
+      temperature: 0.3
+      gamma: 0.015
+      motion_model: "DiffDrive"
+      diff_drive:
+        plugin: "mppi::DiffDriveMotionModel"
+      visualize: false
+      critic_index_to_visualize: 0
+      reset_period: 1.0 # (only in Humble)
+      regenerate_noises: false
+      TrajectoryVisualizer:
+        trajectory_step: 5
+        time_step: 3
+      TrajectoryValidator:
+        plugin: "mppi::DefaultOptimalTrajectoryValidator"
+        collision_lookahead_time: 2.0
+        consider_footprint: false
+      critics: ["ConstraintCritic", "CostCritic", "GoalCritic", "GoalAngleCritic", "PathAlignCritic", "PathFollowCritic", "PathAngleCritic", "PreferForwardCritic"]
+      ConstraintCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 4.0
+      GoalCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 5.0
+        threshold_to_consider: 1.4
+      GoalAngleCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 3.0
+        threshold_to_consider: 0.5
+      PreferForwardCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 5.0
+        threshold_to_consider: 0.5
+      # ObstaclesCritic:
+      #   enabled: true
+      #   cost_power: 1
+      #   repulsion_weight: 1.5
+      #   critical_weight: 20.0
+      #   consider_footprint: false
+      #   collision_cost: 10000.0
+      #   collision_margin_distance: 0.1
+      #   near_goal_distance: 0.5
+      #   inflation_radius: 0.55 # (only in Humble)
+      #   cost_scaling_factor: 10.0 # (only in Humble)
+      CostCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 3.81
+        critical_cost: 300.0
+        consider_footprint: true
+        collision_cost: 1000000.0
+        near_goal_distance: 1.0
+        trajectory_point_step: 2
+      PathAlignCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 14.0
+        max_path_occupancy_ratio: 0.05
+        trajectory_point_step: 4
+        threshold_to_consider: 0.5
+        offset_from_furthest: 20
+        use_path_orientations: false
+      PathFollowCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 5.0
+        offset_from_furthest: 5
+        threshold_to_consider: 1.4
+      PathAngleCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 2.0
+        offset_from_furthest: 4
+        threshold_to_consider: 0.5
+        max_angle_to_furthest: 1.0
+        mode: 0
 
     # https://github.com/blackcoffeerobotics/vector_pursuit_controller#default-parameters  
     # Changes from defaults:
-    #   use_rotate_to_heading: false
-    #   allow_reversing: true
-    #   min_turning_radius
     #   desired_linear_vel, max_*_accel
     #   use_heading_from_path: true
     VP_FollowPath:
       plugin: "vector_pursuit_controller::VectorPursuitController"
       k: 5.0
       desired_linear_vel: 0.3
-      min_turning_radius: 1.1
+      min_turning_radius: 0.0
       lookahead_dist: 1.0
       min_lookahead_dist: 0.5
       max_lookahead_dist: 1.5
@@ -124,8 +219,8 @@ controller_server:
       cost_scaling_dist: 0.5
       cost_scaling_gain: 1.0
       inflation_cost_scaling_factor: 3.0
-      use_rotate_to_heading: false
-      allow_reversing: true
+      use_rotate_to_heading: true
+      allow_reversing: false
       rotate_to_heading_min_angle: 0.5
       max_angular_accel: 2.5
       max_linear_accel: 2.0
@@ -135,7 +230,7 @@ controller_server:
       use_heading_from_path: true
       approach_velocity_scaling_dist: 1.5
 
-    FollowPath:
+    RPP_FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
       desired_linear_vel: 0.4
       lookahead_dist: 2.0 #1.0
@@ -155,8 +250,8 @@ controller_server:
       use_cost_regulated_linear_velocity_scaling: false
       regulated_linear_scaling_min_radius: 0.9
       regulated_linear_scaling_min_speed: 0.25
-      use_rotate_to_heading: false
-      allow_reversing: true
+      use_rotate_to_heading: true
+      allow_reversing: false
       rotate_to_heading_min_angle: 0.785
       max_angular_accel: 3.2
       max_robot_pose_search_dist: 10.0
@@ -168,9 +263,9 @@ controller_server:
       debug_trajectory_details: True
       min_vel_x: 0.0
       min_vel_y: 0.0
-      max_vel_x: 0.5
+      max_vel_x: 0.3
       max_vel_y: 0.0
-      max_vel_theta: 0.75
+      max_vel_theta: 0.5 #0.75
       min_speed_xy: 0.0
       max_speed_xy: 0.26
       min_speed_theta: 0.0
@@ -181,7 +276,7 @@ controller_server:
       acc_lim_theta: 2.2
       decel_lim_x: -1.0
       decel_lim_y: 0.0
-      decel_lim_theta: -0.75
+      decel_lim_theta: -2.2
       vx_samples: 20
       vy_samples: 5
       vtheta_samples: 20
@@ -226,11 +321,12 @@ local_costmap:
       #robot_radius: 0.28
       footprint: "[ [0.460, 0.218], [0.460, -0.218], [-0.100, -0.218], [-0.100, 0.218] ]"
 
-      plugins: ["voxel_layer", "range_layer", "inflation_layer"]
+      #plugins: ["voxel_layer", "range_layer", "inflation_layer"]
+      plugins: ["voxel_layer", "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 2.0 
-        inflation_radius: 3.0
+        cost_scaling_factor: 10.0 
+        inflation_radius: 1.0
       range_layer:
         plugin: "nav2_costmap_2d::RangeSensorLayer"
         enabled: True
@@ -321,8 +417,8 @@ global_costmap:
         map_subscribe_transient_local: True
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 2.0
-        inflation_radius: 3.0
+        cost_scaling_factor: 10.0
+        inflation_radius: 1.0
       keepout_filter:
         plugin: "nav2_costmap_2d::KeepoutFilter"
         enabled: False
@@ -350,7 +446,7 @@ map_saver:
 
 planner_server:
   ros__parameters:
-    expected_planner_frequency: 20.0
+    expected_planner_frequency: 8.0
     use_sim_time: False
     planner_plugins: ["GridBased"]
 
@@ -369,7 +465,7 @@ planner_server:
       analytic_expansion_max_length:  1.5 #3.0  # For Hybrid/Lattice nodes: The maximum length of the analytic expansion to be considered valid to prevent unsafe shortcutting
       analytic_expansion_max_cost: 200.0  # The maximum single cost for any part of an analytic expansion to contain and be valid, except when necessary on approach to goal
       analytic_expansion_max_cost_override: false  #  Whether or not to override the maximum cost setting if within critical distance to goal (ie probably required)
-      minimum_turning_radius: 1.2         # minimum turning radius in m of path / vehicle
+      minimum_turning_radius: 0.0         # minimum turning radius in m of path / vehicle
       reverse_penalty: 200.0              # Penalty to apply if motion is reversing, must be => 1
       change_penalty: 2.0 #0.0            # Penalty to apply if motion is changing directions (L to R), must be >= 0
       non_straight_penalty: 1.2           # Penalty to apply if motion is non-straight, must be => 1
@@ -401,20 +497,17 @@ behavior_server:
     global_costmap_topic: global_costmap/costmap_raw
     local_footprint_topic: local_costmap/published_footprint
     global_footprint_topic: global_costmap/published_footprint
-    cycle_frequency: 10.0
+    cycle_frequency: 8.0
     # Fix - make conditional based on robot base
-    behavior_plugins: ["backup", "drive_on_heading", "assisted_teleop", "wait"]
-    #behavior_plugins: ["spin", "backup", "drive_on_heading", "assisted_teleop", "wait"]    
-    #spin:
-    #  plugin: "nav2_behaviors::Spin"
+    behavior_plugins: ["spin", "backup", "drive_on_heading", "wait"]    
+    spin:
+      plugin: "nav2_behaviors::Spin"
     backup:
       plugin: "nav2_behaviors::BackUp"
     drive_on_heading:
       plugin: "nav2_behaviors::DriveOnHeading"
     wait:
       plugin: "nav2_behaviors::Wait"
-    assisted_teleop:
-      plugin: "nav2_behaviors::AssistedTeleop"
     local_frame: odom
     global_frame: map
     robot_base_frame: base_link
