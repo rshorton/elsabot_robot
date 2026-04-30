@@ -257,18 +257,6 @@ def generate_launch_description():
             }.items()
         ),
 
-        # Configure the base controller which steering mode to use
-        ExecuteProcess(
-            condition=IfCondition(LaunchConfiguration('differential_steering')),
-            cmd=['ros2', 'topic', 'pub', '-1', '/ebot/enable_ackermann', 'std_msgs/msg/Bool', 'data: false'],
-            output='screen'
-        ),
-        ExecuteProcess(
-            condition=UnlessCondition(LaunchConfiguration('differential_steering')),
-            cmd=['ros2', 'topic', 'pub', '-1', '/ebot/enable_ackermann', 'std_msgs/msg/Bool', 'data: true'],
-            output='screen'
-        ),
-
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(sensors_launch_path),
             condition=UnlessCondition(LaunchConfiguration('use_gazebo')),
