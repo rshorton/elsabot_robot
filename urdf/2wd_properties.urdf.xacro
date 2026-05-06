@@ -32,7 +32,7 @@
   </xacro:property>
 
   <xacro:property name="imu_pose">
-    <origin xyz="${0.020 + base_link_x_offset_to_center} 0.0 ${0.220 + base_link_z_offset_to_center}" rpy="0 0 0"/>
+    <origin xyz="${-0.245 + base_link_x_offset_to_center} 0.0 ${0.145 + base_link_z_offset_to_center}" rpy="0 0 0"/>
   </xacro:property>
 
   <xacro:property name="gps_pose">
