@@ -13,4 +13,4 @@ teleop_twist_joy_node:
       #yaw: 2
 
     scale_angular:
-      yaw: 1.0
+      yaw: 0.5
