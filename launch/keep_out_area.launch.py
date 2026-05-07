@@ -9,7 +9,7 @@ from launch.substitutions import LaunchConfiguration
 from nav2_common.launch import RewrittenYaml
 
 #KEEP_OUT='backyard'
-KEEP_OUT='upstairs'
+KEEP_OUT='office_050626'
 
 def generate_launch_description():
 
@@ -18,7 +18,7 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
     autostart = LaunchConfiguration('autostart')
     ko_params_file = LaunchConfiguration('keep_out_params_file')
-    ko_mask_yaml_file = LaunchConfiguration('keep_out_mask')
+    ko_mask_yaml_file = LaunchConfiguration('keep_out_map')
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
         'use_sim_time',
