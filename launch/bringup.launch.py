@@ -25,8 +25,9 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node, SetParameter
 from launch_ros.substitutions import FindPackageShare
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler, LogInfo
 from launch.conditions import IfCondition, UnlessCondition
+from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression, PathJoinSubstitution, EnvironmentVariable
 from launch_xml.launch_description_sources import XMLLaunchDescriptionSource
@@ -86,6 +87,35 @@ def generate_launch_description():
     launch_gazebo = LaunchConfiguration('launch_gazebo')
 
     use_gps = LaunchConfiguration('use_gps')
+
+    # This is used to wait for microros to connect to the robot uC before launching
+    # nav2.  See end of LaunchDescription
+    wait_for_topic_ping = ExecuteProcess(
+        condition=IfCondition(LaunchConfiguration('use_nav')),
+        cmd=[["until ros2 topic echo --once /ebot/odom > /dev/null; do sleep 1; done"]],
+        shell=True,
+        output='screen')
+
+    nav_launch = IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(get_package_share_directory('elsabot_robot'), 'launch', 'navigation.launch.py')),
+            condition=IfCondition(LaunchConfiguration('use_nav')),
+            launch_arguments={
+                'use_sim_time': LaunchConfiguration('use_gazebo'),
+                'map': LaunchConfiguration('map'),
+                'use_keep_out': LaunchConfiguration('use_keep_out'),
+                'keep_out_map': LaunchConfiguration('keep_out_map'),
+                'slam': LaunchConfiguration('slam'),
+                'use_gps': LaunchConfiguration('use_gps'),
+                'differential_steering': LaunchConfiguration('differential_steering')
+            }.items()
+        )
+    # This will set the initial map position to a 'home' position (0,0,0 90 degrees in this case)
+    set_default_initial_pose = ExecuteProcess(
+        condition=IfCondition(LaunchConfiguration('use_nav')),
+        cmd=[["ros2 topic pub -1 /initialpose geometry_msgs/PoseWithCovarianceStamped '{ header: { stamp: {sec: 0, nanosec: 0}, frame_id: \"map\"}, pose: { pose: {position: {x: 0.0, y: 0.0, z: 0.0}, orientation: {w: 0.7071, x: 0.0, y: 0.0, z: 0.7071}}, covariance: [0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0685] } }' "]],
+        shell=True,
+        output='screen')
 
     return LaunchDescription([
 
@@ -217,7 +247,8 @@ def generate_launch_description():
             executable='micro_ros_agent',
             name='micro_ros_agent',
             output='screen',
-            arguments=['serial', '--dev', LaunchConfiguration('base_serial_port')]
+            arguments=['udp4', '--port', '8888']
+            #arguments=['serial', '--dev', LaunchConfiguration('base_serial_port')]
         ),
 
         IncludeLaunchDescription(
@@ -290,20 +321,6 @@ def generate_launch_description():
             parameters=[{'cal_value': 367, 'current_lsb': 0.0002}]
         ),
 
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                os.path.join(get_package_share_directory('elsabot_robot'), 'launch', 'navigation.launch.py')),
-            condition=IfCondition(LaunchConfiguration('use_nav')),
-            launch_arguments={
-                'use_sim_time': LaunchConfiguration('use_gazebo'),
-                'map': LaunchConfiguration('map'),
-                'use_keep_out': LaunchConfiguration('use_keep_out'),
-                'keep_out_map': LaunchConfiguration('keep_out_map'),
-                'slam': LaunchConfiguration('slam'),
-                'use_gps': LaunchConfiguration('use_gps'),
-                'differential_steering': LaunchConfiguration('differential_steering')
-            }.items()
-        ),
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
@@ -344,5 +361,15 @@ def generate_launch_description():
         IncludeLaunchDescription(
             XMLLaunchDescriptionSource(rosbridge_launch_path),
             condition=IfCondition(LaunchConfiguration('use_rosbridge'))
+        ),
+
+        wait_for_topic_ping,
+        
+        RegisterEventHandler(
+            condition=IfCondition(LaunchConfiguration('use_nav')),
+            event_handler=OnProcessExit(
+                target_action=wait_for_topic_ping,
+                on_exit=[LogInfo(msg='Microros started, launching nav'), nav_launch, set_default_initial_pose]
+            )
         )
     ])

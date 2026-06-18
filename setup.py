@@ -17,7 +17,8 @@ setup(
         ('share/' + package_name + '/urdf', glob('urdf/*')),
         ('share/' + package_name + '/nav_bt', glob('nav_bt/*')),
         ('share/' + package_name + '/meshes', glob('meshes/*')),
-        ('share/' + package_name + '/launch', glob('launch/*.launch.py'))
+        ('share/' + package_name + '/launch', glob('launch/*.launch.py')),
+        ('share/' + package_name + '/launch', glob('launch/*.yaml'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,

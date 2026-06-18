@@ -1,0 +1,43 @@
+%YAML 1.2
+---
+
+launch:
+
+- arg:
+    name: "differential_steering"
+    default: "True"
+
+- arg:
+    name: "bt_tree"
+    default: "/robot_ws/src/elsabot_bt/bt_xml/bt_test_ai_chat.xml"    
+
+- include:
+    file: "$(find-pkg-share elsabot_robot)/launch/bringup.launch.py"
+    arg:
+        - name: "differential_steering"
+          value: "$(var differential_steering)"
+        - name: "use_nav"
+          value: "True"          
+
+- include:
+    file: "$(find-pkg-share robot_head)/launch/robot_head.launch.py"
+
+- node:
+    pkg: "elsabot_speech_input"
+    exec: "elsabot_speech_input"
+    on_exit: "shutdown"
+
+- node:
+    pkg: "elsabot_audio_output"
+    exec: "elsabot_audio_output"
+    on_exit: "shutdown"
+
+- node:
+    pkg: "elsabot_bt"
+    exec: "elsabot_bt"
+    on_exit: "shutdown"
+    param:
+    - name: "bt_xml"
+      value: "$(var bt_tree)"
+
+
