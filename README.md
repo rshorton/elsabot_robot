@@ -1,13 +1,13 @@
 # Elsabot Robot
 
 Top-level bring up scripts for the Elsabot robot.  This repo (will) supports multiple base variants of the Elsabot robot (ebot_2wd, ebot_4wd, Jeep)
-* ebot_2wd - original robot chassis using ackerman steering.
+* ebot_2wd - original robot chassis using ackerman steering (or front casters)
 * ebot_4wd - original robot chassis using skid steering.
 * Jeep - powerwheels jeep
 
 Some parts of these scripts and configuration files are from the Linorobot2 project:  https://github.com/linorobot/linorobot2
 
-The firmware for the base microcontroller is based on the linorobot2_hardware project.  See this fork for the firmware used for the Elsabot 4WD base (ackerman-changes branch): https://github.com/rshorton/linorobot2_hardware.
+The firmware for the base microcontroller is based on the linorobot2_hardware project.  See this fork for the firmware used for the Elsabot 2WD base: https://github.com/rshorton/linorobot2_hardware.
 
 ## Status of Project
 
@@ -67,11 +67,23 @@ elsabot_docker/open_shell.sh
 source /opt/foxglove/foxglove-sdk/ros/install/local_setup.bash; ros2 launch foxglove_bridge foxglove_bridge_launch.xml port:=8765
 ```
 
-2. Start navigation using another shell
+3. Start navigation using another shell
 ```
 elsabot_docker/open_shell.sh
 ros2 launch elsabot_robot navigation.launch.py
 ```
+
+## Running All
+
+To combine steps 1 & 2 above and launch all other nodes including speech in/out and elsabot_bt, use:
+
+```
+elsabot_docker/run_ros_docker.sh
+ros2 launch elsabot_robot bringup_all.launch.yaml
+```     
+
+This will also set the initial position at the 0,0,0 map location.  I tweak the map so that location corresponds to the desired home position of the robot.
+
 
 ### Open Foxglove (recommended) or RViz2
 
