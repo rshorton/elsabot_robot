@@ -8,6 +8,8 @@
   <xacro:include filename="$(find elsabot_robot)/urdf/sensors/oakd_on_ptbase.urdf.xacro" />
   <xacro:include filename="$(find elsabot_robot)/urdf/sensors/hcsr04.urdf.xacro" />
   <xacro:include filename="$(find elsabot_robot)/urdf/sensors/hcsr04_servo_pan_mount.xacro" />
+  <xacro:include filename="$(find elsabot_robot)/urdf/sensors/tof.urdf.xacro" />
+  <xacro:include filename="$(find elsabot_robot)/urdf/sensors/tof_stepper_pan_mount.xacro" />
   
   <xacro:base 
     length="${base_length}" 
@@ -65,6 +67,32 @@
     parent_link="hcsr04_back_servo_pan_link">
     <xacro:insert_block name="hcsr04_range_back_pose" />
   </xacro:hcsr04_sensor>
+
+  <!-- TOF on stepper not used -->
+  <!--xacro:tof_stepper_pan_mount
+    frame_id="tof_pan_joint_front"
+    parent_link="base_link"
+    child_link="tof_front_stepper_servo_pan_link">
+    <xacro:insert_block name="tof_front_stepper_pose" />
+  </xacro:tof_stepper_pan_mount-->
+
+  <!--xacro:tof_sensor
+    frame_id="front_tof_frame"
+    parent_link="tof_front_stepper_servo_pan_link">
+    <xacro:insert_block name="tof_sensor_front_pose" />
+  </xacro:tof_sensor-->
+
+  <xacro:tof_sensor
+    frame_id="front_left_tof_frame"
+    parent_link="base_link">
+    <xacro:insert_block name="tof_sensor_front_left_pose" />
+  </xacro:tof_sensor>
+
+<xacro:tof_sensor
+    frame_id="front_right_tof_frame"
+    parent_link="base_link">
+    <xacro:insert_block name="tof_sensor_front_right_pose" />
+  </xacro:tof_sensor>
 
   <gazebo>
     <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher"/>

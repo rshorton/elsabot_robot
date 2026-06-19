@@ -335,12 +335,7 @@ local_costmap:
       #robot_radius: 0.28
       footprint: "[ [0.460, 0.218], [0.460, -0.218], [-0.100, -0.218], [-0.100, 0.218] ]"
 
-      #plugins: ["voxel_layer", "range_layer", "inflation_layer"]
-      plugins: ["voxel_layer", "inflation_layer"]
-      inflation_layer:
-        plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 2.0 
-        inflation_radius: 1.0
+      plugins: ["obstacle_layer", "inflation_layer"]
       range_layer:
         plugin: "nav2_costmap_2d::RangeSensorLayer"
         enabled: True
@@ -350,42 +345,50 @@ local_costmap:
         mark_threshold: 0.8
         clear_threshold: 0.2
         no_readings_timeout: 5.0
-      voxel_layer:
-        plugin: "nav2_costmap_2d::VoxelLayer"
-        enabled: True
-        publish_voxel_map: False
-        origin_z: 0.0
-        z_resolution: 0.05
-        z_voxels: 16
-        max_obstacle_height: 2.0
-        mark_threshold: 0
-        #observation_sources: scan oakd
-        observation_sources: scan
+
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: true
+        combination_method: 1
+        
+        tf_filter_tolerance: 0.5
+        observation_sources: tof_front_left tof_front_right scan
+
         scan:
           topic: /scan
+          obstacle_max_range: 2.5
+          obstacle_min_range: 0.0
+          raytrace_max_range: 3.0
+          raytrace_min_range: 0.0
           max_obstacle_height: 2.0
+          min_obstacle_height: 0.0
           clearing: True
           marking: True
           data_type: "LaserScan"
-        oakd:
-          topic: /oak/points
-          raytrace_min_range: 0.5
-          min_obstacle_height: 0.0
-          max_obstacle_height: 2.0 
-          clearing: True
-          marking: True
+          inf_is_valid: false          
+        tof_front_left:
+          topic: /ebot/front_left_tof_sensor_point_cloud
           data_type: "PointCloud2"
-      voxel3d_layer:
-        plugin: "nav2_costmap_2d::VoxelLayer"
-        enabled: True
-        publish_voxel_map: True
-        origin_z: 0.0
-        z_resolution: 0.05
-        z_voxels: 16
-        mark_threshold: 1
-        observation_sources: oakd
-        min_obstacle_height: 0.00
-        max_obstacle_height: 2.0 
+          marking: True
+          clearing: True
+          min_obstacle_height: 0.02
+          max_obstacle_height: 1.1
+          obstacle_max_range: 2.0
+          observation_persistence: 0.0
+        tof_front_right:
+          topic: /ebot/front_right_tof_sensor_point_cloud
+          data_type: "PointCloud2"
+          marking: True
+          clearing: True
+          min_obstacle_height: 0.02
+          max_obstacle_height: 1.1
+          obstacle_max_range: 2.0
+          observation_persistence: 0.0
+
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 2.0 
+        inflation_radius: 1.0
       static_layer:
         map_subscribe_transient_local: True
       keepout_filter:
@@ -414,18 +417,8 @@ global_costmap:
 
       resolution: 0.05
       track_unknown_space: true
-      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+      plugins: ["static_layer", "inflation_layer"]
       #filters: ["keepout_filter"]
-      obstacle_layer:
-        plugin: "nav2_costmap_2d::ObstacleLayer"
-        enabled: True
-        observation_sources: scan
-        scan:
-          topic: /scan
-          max_obstacle_height: 2.0
-          clearing: True
-          marking: True
-          data_type: "LaserScan"
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: True
