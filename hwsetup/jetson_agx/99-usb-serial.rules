@@ -14,9 +14,13 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="1546",ATTRS{idProduct}=="01a7", SYMLINK+="el
 SUBSYSTEM=="tty", ATTRS{idVendor}=="0403",ATTRS{idProduct}=="6015", SYMLINK+="elsabot_dev_links/create2"
 
 # Alt servo driver (used for arm)
-SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="elsabot_dev_links/servo_driver"  MODE="0666"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="elsabot_dev_links/servo_driver",  MODE="0666"
 # Other
 #SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="elsabot_dev_links/tty_arduino_nano"
 #SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="003d", SYMLINK+="elsabot_dev_links/ttyACM0Due0"
 #SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="003e", SYMLINK+="elsabot_dev_links/ttyACM0Due1"
+
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d3", ATTRS{serial}=="5AAF219865", SYMLINK+="elsabot_dev_links/so101_leader", MODE="0666"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d3", ATTRS{serial}=="5AAF219934", SYMLINK+="elsabot_dev_links/so101_follower", MODE="0666"
+
 
