@@ -335,7 +335,7 @@ local_costmap:
       #robot_radius: 0.28
       footprint: "[ [0.460, 0.218], [0.460, -0.218], [-0.100, -0.218], [-0.100, 0.218] ]"
 
-      plugins: ["obstacle_layer", "inflation_layer"]
+      plugins: ["obstacle_layer", "denoise_layer", "inflation_layer"]
       range_layer:
         plugin: "nav2_costmap_2d::RangeSensorLayer"
         enabled: True
@@ -352,7 +352,7 @@ local_costmap:
         combination_method: 1
         
         tf_filter_tolerance: 0.5
-        observation_sources: tof_front_left tof_front_right scan
+        observation_sources: tof_front_left tof_front_right scan tof_back_left tof_back_right
 
         scan:
           topic: /scan
@@ -371,7 +371,7 @@ local_costmap:
           data_type: "PointCloud2"
           marking: True
           clearing: True
-          min_obstacle_height: 0.02
+          min_obstacle_height: 0.0
           max_obstacle_height: 1.1
           obstacle_max_range: 2.0
           observation_persistence: 0.0
@@ -380,10 +380,34 @@ local_costmap:
           data_type: "PointCloud2"
           marking: True
           clearing: True
-          min_obstacle_height: 0.02
+          min_obstacle_height: 0.0
           max_obstacle_height: 1.1
           obstacle_max_range: 2.0
           observation_persistence: 0.0
+        tof_back_left:
+          topic: /ebot/back_left_tof_sensor_point_cloud
+          data_type: "PointCloud2"
+          marking: True
+          clearing: True
+          min_obstacle_height: 0.0
+          max_obstacle_height: 1.1
+          obstacle_max_range: 2.0
+          observation_persistence: 0.0
+        tof_back_right:
+          topic: /ebot/back_right_tof_sensor_point_cloud
+          data_type: "PointCloud2"
+          marking: True
+          clearing: True
+          min_obstacle_height: 0.0
+          max_obstacle_height: 1.1
+          obstacle_max_range: 2.0
+          observation_persistence: 0.0
+
+      denoise_layer:
+        plugin: "nav2_costmap_2d::DenoiseLayer"
+        enabled: false
+        minimal_group_size: 2
+        group_connectivity_type: 8
 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
