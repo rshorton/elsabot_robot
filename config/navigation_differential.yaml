@@ -408,7 +408,7 @@ local_costmap:
 
       denoise_layer:
         plugin: "nav2_costmap_2d::DenoiseLayer"
-        enabled: false
+        enabled: true
         minimal_group_size: 2
         group_connectivity_type: 8
 
