@@ -203,4 +203,21 @@ Add '#' infront of the line making it something similar to:
 ```
 #DPkg::Post-Invoke {"if [ -d /var/lib/update-notifier ]; then touch /var/lib/update-notifier/dpkg-run-stamp; fi; if [ -e /var/lib/update-notifier/updates-available ]; then echo > /var/lib/update-notifier/updates-available; fi "; };
 ```
+21\. Created directory camera snapshots
+
+```
+mkdir ~/robot_ws/camera_snapshots
+
+22\. Copied audio files from old setup.  (Fix - put in a repo)
+
+robot_ws/audio_files
+
+23\. Enable Desktop Sharing (and remote control) on Jetson
+
+a. Set password
+
+b. Configure Remmina client
+
+Select RDP
+Color depth: Automatic (32bpp) (Server chooses its best format)
 
