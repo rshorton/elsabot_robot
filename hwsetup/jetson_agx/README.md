@@ -212,7 +212,7 @@ mkdir ~/robot_ws/camera_snapshots
 
 robot_ws/audio_files
 
-23\. Enable Desktop Sharing (and remote control) on Jetson
+23\. Enabled Desktop Sharing (and remote control) on Jetson
 
 a. Set password
 
@@ -221,3 +221,13 @@ b. Configure Remmina client
 Select RDP
 Color depth: Automatic (32bpp) (Server chooses its best format)
 
+24\. Updated reSpeaker mic. 
+
+After updating elsabot audio related packages as needed, no audio was heard via the 3.5 output jack.
+
+Needed to increase PCM audio mixer level (https://wiki.seeedstudio.com/respeaker_xvf3800_introduction/#main-components):
+a. Run alasmixer
+b. Press F6 and select Respeaker device.
+c. Increase PCM levels (both) to 92.
+d. ESC to exit.
+e. sudo alsactl store
