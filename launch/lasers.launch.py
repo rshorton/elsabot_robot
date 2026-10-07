@@ -57,9 +57,9 @@ def generate_launch_description():
 
         return [
             Node(
-                name='rplidar_composition',
+                name='rplidar_node',
                 package='rplidar_ros',
-                executable='rplidar_composition',
+                executable='rplidar_node',
                 output='screen',
                 remappings=[('scan', lidar_topic)],
                 parameters=[{
