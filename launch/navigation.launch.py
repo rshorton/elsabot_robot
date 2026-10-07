@@ -72,14 +72,9 @@ def generate_launch_description():
     nav2_bt_to_pose_xml_path = os.path.join(get_package_share_directory('elsabot_robot'), 'nav_bt', 'navigate_to_pose_w_replanning_and_recovery.xml')
     nav2_bt_follow_point_xml_path = os.path.join(get_package_share_directory('elsabot_robot'), 'nav_bt', 'follow_point.xml')
 
-    namespace = LaunchConfiguration('namespace')
-    use_namespace = LaunchConfiguration('use_namespace')
     slam = LaunchConfiguration('slam')
     use_sim_time = LaunchConfiguration('use_sim_time')
-    autostart = LaunchConfiguration('autostart')
-    use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
-    use_composition = LaunchConfiguration('use_composition')
     differential_steering = LaunchConfiguration('differential_steering')
 
     nav2_launch_path = PathJoinSubstitution(
@@ -96,6 +91,7 @@ def generate_launch_description():
         nav2_beh_mode = context.launch_configurations['nav2_behavior_mode']
         use_sim_time = context.launch_configurations['use_sim_time']
         differential_steering = context.launch_configurations['differential_steering']
+        # fix - handle map config
 
         logger.info('prepare_nav_launch: use_gps: {}, nav2_beh_mode: {}, differential_steering: {}'.format(use_gps,
                      nav2_beh_mode, differential_steering))
@@ -129,7 +125,6 @@ def generate_launch_description():
         # Re-write the nav parameters file to use our modified nav bt xml files.
         rewritten_yaml = RewrittenYaml(
             source_file=nav_yaml,
-            root_key=namespace,
             param_rewrites=param_substitutions,
             convert_types=True)
             
@@ -172,82 +167,18 @@ def generate_launch_description():
             logger.info(f.read())
 
         descriptions = [
-            SetParameter(name='use_sim_time', value=LaunchConfiguration('use_sim_time')),
-
-            GroupAction([
-                PushRosNamespace(
-                    condition=IfCondition(use_namespace),
-                    namespace=namespace),
-
-                Node(
-                    condition=IfCondition(use_composition),
-                    name='nav2_container',
-                    package='rclcpp_components',
-                    executable='component_container_isolated',
-                    parameters=[nav2_config_file, {'autostart': autostart}],
-                    arguments=['--ros-args', '--log-level', log_level],
-                    remappings=[('/tf', 'tf'), ('/tf_static', 'tf_static')],
-                    output='screen'
-                ),
-
                 IncludeLaunchDescription(
-                    PythonLaunchDescriptionSource(os.path.join(get_package_share_directory('nav2_bringup'), 'launch', 'slam_launch.py')),
-                    condition=IfCondition(slam),
-                    launch_arguments={'namespace': namespace,
-                                    'use_sim_time': use_sim_time,
-                                    'autostart': autostart,
-                                    'use_respawn': use_respawn,
+                    PythonLaunchDescriptionSource(nav2_launch_path),
+                    launch_arguments={'use_sim_time': use_sim_time,
+                                    'slam': slam,
+                                    'map_yaml_file': default_map_path,
+                                    'use_keepout_zones': LaunchConfiguration("use_keep_out"),
+                                    'keepout_mask_yaml_file': LaunchConfiguration("keep_out_map"),
+                                    'use_speed_zones': 'False',
+                                    'log_level': log_level,
                                     'params_file': nav2_config_file}.items()
-                ),
-
-                IncludeLaunchDescription(
-                    PythonLaunchDescriptionSource(os.path.join(get_package_share_directory('nav2_bringup'), 'launch', 'localization_launch.py')),
-                    condition=IfCondition( AndSubstitution( NotSubstitution(slam), NotSubstitution(use_gps) ) ),
-                    launch_arguments={'namespace': '',
-                                    'map': default_map_path,
-                                    'use_sim_time': use_sim_time,
-                                    'autostart': autostart,
-                                    'params_file': nav2_config_file,
-                                    'use_composition': use_composition,
-                                    'use_respawn': use_respawn,
-                                    'container_name': 'nav2_container'}.items()
-                ),
-
-                IncludeLaunchDescription(
-                    PythonLaunchDescriptionSource(os.path.join(get_package_share_directory('nav2_bringup'), 'launch', 'navigation_launch.py')),
-                    launch_arguments={'namespace': namespace,
-                                    'use_sim_time': use_sim_time,
-                                    'autostart': autostart,
-                                    'params_file': nav2_config_file,
-                                    'use_composition': use_composition,
-                                    'use_respawn': use_respawn,
-                                    'container_name': 'nav2_container'}.items()
                 )
-            ]),
-
-            # Conditionally start the map servers for supporting a map keep-out area
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(os.path.join(get_package_share_directory('elsabot_robot'), 'launch', 'keep_out_area.launch.py')),
-                condition=IfCondition(LaunchConfiguration("use_keep_out")),
-                launch_arguments={
-                    'keep_out_map': LaunchConfiguration("keep_out_map"),
-                    'use_sim_time': LaunchConfiguration("use_sim_time"),
-                    'autostart': LaunchConfiguration("autostart")}.items()
-            )
-
-        ]
-        HIDE_descriptions = [
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(nav2_launch_path),
-                launch_arguments={
-                    'use_sim_time': LaunchConfiguration("use_sim_time"),
-                    'map': default_map_path,
-                    'slam': slam,
-                    'log_level': "info",
-                    'params_file': nav2_config_file
-                }.items()
-            )
-        ]
+        ]            
         return descriptions;
 
 
@@ -300,7 +231,6 @@ def generate_launch_description():
             description='Enable use of keep-out area map'
         ),
 
-
         DeclareLaunchArgument(
             name='nav2_behavior_mode', 
             default_value='nav_to_pose',
@@ -312,38 +242,6 @@ def generate_launch_description():
             default_value='info',
             description='log level'
         ),
-    
-        DeclareLaunchArgument(
-            name='autostart',
-            default_value='true',
-            description='Automatically startup the nav2 stack'
-        ),
-
-        DeclareLaunchArgument(
-            name='use_composition',
-            default_value='True',
-            description='Whether to use composed bringup'
-        ),
-
-        DeclareLaunchArgument(
-            name='namespace',
-            default_value='',
-            description='Top-level namespace'
-        ),
-
-        DeclareLaunchArgument(
-            name='use_namespace',
-            default_value='False',
-            description='Whether to apply a namespace to the navigation stack'
-        ),
-
-        DeclareLaunchArgument(
-            name='use_respawn',
-            default_value='False',
-            description='Whether to respawn if a node crashes. Applied when composition is disabled.'
-        ),
-
-        SetParameter(name='use_sim_time', value=LaunchConfiguration("use_sim_time")),
 
         OpaqueFunction(function=prepare_nav_launch),
 
