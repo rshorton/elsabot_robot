@@ -207,6 +207,7 @@ Add '#' infront of the line making it something similar to:
 
 ```
 mkdir ~/robot_ws/camera_snapshots
+```
 
 22\. Copied audio files from old setup.  (Fix - put in a repo)
 
@@ -225,9 +226,55 @@ Color depth: Automatic (32bpp) (Server chooses its best format)
 
 After updating elsabot audio related packages as needed, no audio was heard via the 3.5 output jack.
 
-Needed to increase PCM audio mixer level (https://wiki.seeedstudio.com/respeaker_xvf3800_introduction/#main-components):
-a. Run alasmixer
-b. Press F6 and select Respeaker device.
-c. Increase PCM levels (both) to 92.
-d. ESC to exit.
-e. sudo alsactl store
+Needed to increase volume of respeaker audio output.  Note the directions here: (https://wiki.seeedstudio.com/respeaker_xvf3800_introduction/#main-components) are obsolete since ubuntu 24.04 uses pipewire above alsa.  As such, the mixer volue set by alsamixer gets overridden on boot.
+
+WirePlumber (wpctl) is used to configure things for PipeWire
+
+Show devices:
+```
+wpctl status
+```
+
+Show properties for a device (53 in this case determined from 'status'):
+```
+wpctl inspect 53
+```
+
+Set the volue for device 53:
+```
+wpctl set-volume 53 0.93
+```
+
+Setup a config to be used on boot:
+
+a.  Create directory:
+
+```
+mkdir -p ~/.config/wireplumber/wireplumber.conf.d/
+```
+
+b.  Save the following to file: 
+
+```
+~/.config/wireplumber/wireplumber.conf.d/50-respeaker-volume.conf
+```
+
+```
+monitor.alsa.rules = [
+  {
+    matches = [
+      {
+        node.name = "~alsa_output.*reSpeaker*"
+      }
+    ]
+    actions = {
+      update-props = {
+        node.description = "reSpeaker XVF3800 4-Mic Array Analog Stereo"
+        # Lock default volume initialization properties if supported by the driver
+        audio.volume = 0.93
+      }
+    }
+  }
+]
+
+```
