@@ -247,8 +247,8 @@ def generate_launch_description():
             executable='micro_ros_agent',
             name='micro_ros_agent',
             output='screen',
-            arguments=['udp4', '--port', '8888']
-            #arguments=['serial', '--dev', LaunchConfiguration('base_serial_port')]
+            #arguments=['udp4', '--port', '8888']
+            arguments=['serial', '--dev', LaunchConfiguration('base_serial_port')]
         ),
 
         IncludeLaunchDescription(
