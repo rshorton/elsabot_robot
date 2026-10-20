@@ -12,18 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
+from ament_index_python.packages import get_package_share_directory
+
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
-from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
+from launch.conditions import IfCondition
+from launch.substitutions import PathJoinSubstitution, LaunchConfiguration, EqualsSubstitution
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.substitutions import FindPackageShare
+from launch_ros.actions import Node
 
 def generate_launch_description():
 
     laser_launch_path = PathJoinSubstitution(
         [FindPackageShare('elsabot_robot'), 'launch', 'lasers.launch.py']
     )
-
+    
     return LaunchDescription([
 
         DeclareLaunchArgument(
@@ -37,6 +43,18 @@ def generate_launch_description():
             launch_arguments={
                 'robot_base': LaunchConfiguration('robot_base')
             }.items()
+        ),
+
+        # Jeep base uses IMU mounted on the compute rack
+        Node(
+            condition=IfCondition(
+                EqualsSubstitution(LaunchConfiguration('robot_base'), 'jeep')),
+            package='bno08x_driver',  
+            executable='bno08x_driver',  
+            name='bno08x_driver',
+            output='screen',
+            parameters=[os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'bno085_i2c.yaml')],
+            remappings=[('/imu', '/ebot/imu/data'), ('/magnetic_field', '/ebot/imu/mag')]
         )
     ])
 

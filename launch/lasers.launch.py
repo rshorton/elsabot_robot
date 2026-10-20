@@ -105,7 +105,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             name='use_filter', 
             default_value='False',
-            description='True to use scan filter.'
+            description='True to use scan filter (and if config for specified base exist).'
         ),
 
         OpaqueFunction(function=prepare_nodes)

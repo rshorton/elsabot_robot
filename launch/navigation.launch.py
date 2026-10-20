@@ -64,6 +64,8 @@ def generate_launch_description():
     # Nav2 parameter file and delta files
     nav2_config_path_base_differential = os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'navigation_differential.yaml')
     nav2_config_path_base_ackermann = os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'navigation_ackermann.yaml')
+    nav2_config_path_base_jeep = os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'navigation_jeep.yaml')
+
     nav2_config_path_fixed_path_pure_pursuit_deltas = os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'navigation_fixed_path_pure_pursuit_deltas.yaml')
     nav2_config_path_gps_deltas = os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'navigation_gps_deltas.yaml')
 
@@ -75,6 +77,8 @@ def generate_launch_description():
     slam = LaunchConfiguration('slam')
     use_sim_time = LaunchConfiguration('use_sim_time')
     log_level = LaunchConfiguration('log_level')
+
+    robot_base = LaunchConfiguration('robot_base')
     differential_steering = LaunchConfiguration('differential_steering')
 
     nav2_launch_path = PathJoinSubstitution(
@@ -90,18 +94,22 @@ def generate_launch_description():
         use_gps = context.launch_configurations['use_gps']
         nav2_beh_mode = context.launch_configurations['nav2_behavior_mode']
         use_sim_time = context.launch_configurations['use_sim_time']
+        robot_base = context.launch_configurations['robot_base']
         differential_steering = context.launch_configurations['differential_steering']
         # fix - handle map config
 
-        logger.info('prepare_nav_launch: use_gps: {}, nav2_beh_mode: {}, differential_steering: {}'.format(use_gps,
-                     nav2_beh_mode, differential_steering))
+        logger.info('prepare_nav_launch: use_gps: {}, nav2_beh_mode: {}, robot_base: {}, differential_steering: {}'.format(use_gps,
+                     nav2_beh_mode, robot_base, differential_steering))
 
         # Combine base Nav yaml file with other deltas as needed
 
-        if differential_steering == 'True':
-            nav_yaml = nav2_config_path_base_differential
+        if robot_base == 'jeep':
+            nav_yaml = nav2_config_path_base_jeep
         else:
-            nav_yaml = nav2_config_path_base_ackermann
+            if differential_steering == 'True':
+                nav_yaml = nav2_config_path_base_differential
+            else:
+                nav_yaml = nav2_config_path_base_ackermann
 
         #nav_yaml = nav2_config_path_base
 
@@ -134,7 +142,10 @@ def generate_launch_description():
         # be layered over the defaults
         append_files = []
         if use_gps == 'True':
-            append_files.append(nav2_config_path_gps_deltas)
+            if robot_base == 'jeep':
+                append_files.append(nav2_config_path_gps_deltas_jeep)
+            else:
+                append_files.append(nav2_config_path_gps_deltas)
 
         if nav2_beh_mode == 'nav_fixed_path_with_pure_pursuit':
             append_files.append(nav2_config_path_fixed_path_pure_pursuit_deltas)
@@ -159,7 +170,6 @@ def generate_launch_description():
                     print(f"Error: {e}. Cannot open nav2 config file to append cfg data")
                 except Exception as e:
                     print(f"An error occurred: {e}")
-
         
         # Dump the config to check it
         logger.info("Merged nav yaml:\n")
@@ -183,6 +193,12 @@ def generate_launch_description():
 
 
     return LaunchDescription([
+        DeclareLaunchArgument(
+            name='robot_base', 
+            default_value='ebot_2wd',
+            description='Elsabot robot base variant to use.'
+        ),
+
         DeclareLaunchArgument(
             name='differential_steering', 
             default_value='False',

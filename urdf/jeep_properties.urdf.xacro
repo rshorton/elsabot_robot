@@ -1,6 +1,13 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:property name="base_length" value="0.110" />
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+
+  <!-- x,y positions are relative to the center of the robot -->
+
+  <!-- Set to true of if using an IMU mounted on the base -->
+  <xacro:property name="use_base_imu" value="false" />
+
+  <xacro:property name="base_length" value="01.10" />
   <xacro:property name="base_width" value="0.653" />
   <xacro:property name="base_height" value="0.450" />
   <xacro:property name="base_mass" value="50.0" />
@@ -8,7 +15,8 @@
   <xacro:property name="wheel_base" value="0.708" />
   <xacro:property name="wheel_radius" value="0.140" />
   <xacro:property name="wheel_width" value="0.170" />
-  <xacro:property name="wheel_pos_x" value="0.354" />
+  <xacro:property name="wheel_pos_x_rear" value="-0.354" />
+  <xacro:property name="wheel_pos_x_front" value="0.354" />
   <xacro:property name="wheel_pos_y" value="0.3265" />
   <xacro:property name="wheel_pos_z" value="0.0" />
   <xacro:property name="wheel_mass" value="0.2" />
@@ -18,37 +26,52 @@
   <xacro:property name="kingpin_width" value="0.490" />
   <xacro:property name="wheel_center_to_kingpin" value="0.082" />
   
+  <!-- base_link_*_offset_to_center is used to move the base link x,z
+       origin to the rear axle center when using ackermann steering. -->
+  <xacro:property name="base_link_x_offset_to_center" value="${-wheel_pos_x_rear}" />
+  <xacro:property name="base_link_z_offset_to_center" value="0.0" />
 
   <xacro:property name="laser_pose">
-    <origin xyz="0.354 0 0.440" rpy="0 0 3.14"/>
+    <origin xyz="${0.354 + base_link_x_offset_to_center} 0 ${0.440 + base_link_z_offset_to_center}" rpy="0 0 3.14"/>
   </xacro:property>
 
-  <xacro:property name="imu_pose">
-    <origin xyz="-0.331 0.055 0.066" rpy="0 0 0"/>
+  <!-- IMU mounted on base -->
+  <xacro:if value="${use_base_imu}">
+    <xacro:property name="imu_pose">
+      <origin xyz="${-0.331 + base_link_x_offset_to_center} 0.055 ${0.066 + base_link_z_offset_to_center}" rpy="0 0 0"/>
+    </xacro:property>
+  </xacro:if>    
+
+  <!-- IMU mounted on vertical rack -->
+  <xacro:unless value="${use_base_imu}">
+    <xacro:property name="imu_pose">
+      <origin xyz="${-0.504 + 0.02 + base_link_x_offset_to_center} -0.095 ${0.298 + 0.340 + base_link_z_offset_to_center}" rpy="0 0 0"/>
+    </xacro:property>
+  </xacro:unless>
+
+  <xacro:property name="gps_pose">
+    <origin xyz="${-0.504 - 0.150 + base_link_x_offset_to_center} 0.0 ${0.298 + 0.7 + base_link_z_offset_to_center}" rpy="0 0 0" /> 
   </xacro:property>
 
   <xacro:property name="depth_sensor_pose">
-    <origin xyz="-0.065 0 0.255" rpy="0 0 0"/>
+    <origin xyz="${-0.504 + 0.01 + base_link_x_offset_to_center} 0 ${0.298 + 0.540 + base_link_z_offset_to_center}" rpy="0 0 0"/>
   </xacro:property>
 
-  <xacro:property name="range_back_left_pose">
-    <origin xyz="-0.543 0.205 0.298" rpy="0 0 -3.14"/>
+  <xacro:property name="hcsr04_range_back_left_pose">
+    <origin xyz="${-0.543 + base_link_x_offset_to_center} 0.205 ${0.298 + base_link_z_offset_to_center}" rpy="0 0 -3.14"/>
   </xacro:property>
 
-  <xacro:property name="range_back_right_pose">
-    <origin xyz="-0.543 -0.205 0.298" rpy="0 0 -3.14"/>
+  <xacro:property name="hcsr04_range_back_right_pose">
+    <origin xyz="${-0.543 + base_link_x_offset_to_center} -0.205 ${0.298 + base_link_z_offset_to_center}" rpy="0 0 -3.14"/>
   </xacro:property>
 
-  <!-- OakD as depth sensor -->
-  <xacro:property name="depth_camera_name" value="oak" />
-  <xacro:property name="depth_camera_model" value="OAK-D" />
-  <xacro:property name="depth_base_frame" value="front_oakd_base_link" />
-  <xacro:property name="depth_parent_frame" value="base_link" />
-  <xacro:property name="depth_cam_pos_x" value="0.254" />
-  <xacro:property name="depth_cam_pos_y" value="0.0" />
-  <xacro:property name="depth_cam_pos_z" value="0.620" />
-  <xacro:property name="depth_cam_roll" value="0.0" />
-  <xacro:property name="depth_cam_pitch" value="0.42" />
-  <xacro:property name="depth_cam_yaw" value="0.0" />
+  <!-- Fix - check pitch angle and y offset -->
+  <xacro:property name="tof_sensor_front_left_pose">
+    <origin xyz="${0.530 + base_link_x_offset_to_center} 0.013 ${0.095 + base_link_z_offset_to_center}" rpy="0 ${M_PI*12.0/180.0} ${M_PI*30.0/180.0}"/>
+  </xacro:property>
+
+  <xacro:property name="tof_sensor_front_right_pose">
+    <origin xyz="${0.530 + base_link_x_offset_to_center} -0.013 ${0.095 + base_link_z_offset_to_center}" rpy="0 ${M_PI*12.0/180.0} -${M_PI*30.0/180.0}"/>
+  </xacro:property>
 
 </robot>

@@ -14,18 +14,49 @@
 
 # Various modifications by Scott Horton for Elsabot robots
 
-from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+import os
+
+from ament_index_python.packages import get_package_share_directory
+
+from launch import LaunchDescription, logging
+from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 
 def generate_launch_description():
-    joy_config_path = PathJoinSubstitution(
-        [FindPackageShare("elsabot_robot"), "config", "joy.yaml"]
-    )
+    def prepare_nodes(context, *args, **kwargs):
+        logger = logging.get_logger('launch.user')
+
+        robot_base = context.launch_configurations['robot_base']
+        cmd_vel_topic = context.launch_configurations['cmd_vel_topic']
+
+        if robot_base == 'jeep':
+            config_path = os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'joy_jeep.yaml')
+        else:
+            # Fix - use separate configs for other base variants            
+            config_path = os.path.join(get_package_share_directory('elsabot_robot'), 'config', 'joy.yaml')
+
+        logger.info("joy_telop launch: robot_base: %s, config_path: %s" % (robot_base, config_path))
+
+        return [
+            Node(
+                package='teleop_twist_joy',
+                executable='teleop_node',
+                name='teleop_twist_joy_node',
+                output='screen',
+                parameters=[config_path],
+                remappings=[('cmd_vel', cmd_vel_topic)]
+            )
+        ]
 
     return LaunchDescription([
+        DeclareLaunchArgument(
+            name='robot_base', 
+            default_value='ebot_2wd',
+            description='Elsabot robot base variant to use.'
+        ),
+
         DeclareLaunchArgument(
             name='cmd_vel_topic', 
             default_value='cmd_vel',
@@ -39,12 +70,5 @@ def generate_launch_description():
             output='screen',
         ),
 
-        Node(
-            package='teleop_twist_joy',
-            executable='teleop_node',
-            name='teleop_twist_joy_node',
-            output='screen',
-            parameters=[joy_config_path],
-            remappings=[('cmd_vel', LaunchConfiguration('cmd_vel_topic'))]
-        )
+        OpaqueFunction(function=prepare_nodes)
     ])

@@ -22,22 +22,49 @@ import yaml
 
 from ament_index_python.packages import get_package_share_directory
 
-from launch import LaunchDescription
+from launch import LaunchDescription, logging
 from launch_ros.actions import Node, SetParameter
 from launch_ros.substitutions import FindPackageShare
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler, LogInfo
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler, LogInfo, OpaqueFunction
 from launch.conditions import IfCondition, UnlessCondition
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression, PathJoinSubstitution, EnvironmentVariable
 from launch_xml.launch_description_sources import XMLLaunchDescriptionSource
 
-
 MAP_NAME='upstairs3'
 #MAP_NAME='backyard'
 #MAP_NAME='downstairs'
 
 def generate_launch_description():
+
+    def get_description_launch(context, *args, **kwargs):
+        logger = logging.get_logger('launch.user')
+
+        robot_base = context.launch_configurations['robot_base']
+        differential_steering = context.launch_configurations['differential_steering']
+
+        logger.info("bringup launch: Selecting robot description launcher for: robot_base: %s, differential_steering: %s" %
+                     (robot_base, differential_steering))
+
+        if robot_base == 'jeep':
+            urdf_path = PathJoinSubstitution([FindPackageShare("elsabot_robot"), "urdf/robots",  'jeep' + f".urdf.xacro"])
+        elif differential_steering == 'true':
+            urdf_path = PathJoinSubstitution([FindPackageShare("elsabot_robot"), "urdf/robots",  'ebot_2wd_differential' + f".urdf.xacro"])
+        else:
+            urdf_path = PathJoinSubstitution([FindPackageShare("elsabot_robot"), "urdf/robots",  'ebot_2wd_ackermann' + f".urdf.xacro"])
+
+        return [
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(description_launch_path),
+                launch_arguments={
+                    'use_sim_time': LaunchConfiguration('use_gazebo'),
+                    'publish_joints': 'false',
+                    'robot_base': LaunchConfiguration('robot_base'),
+                    'urdf': urdf_path
+                }.items()
+            )
+        ]
 
     elsabot_robot_dir = get_package_share_directory('elsabot_robot')
 
@@ -97,8 +124,8 @@ def generate_launch_description():
         output='screen')
 
     nav_launch = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                os.path.join(get_package_share_directory('elsabot_robot'), 'launch', 'navigation.launch.py')),
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('elsabot_robot'), 'launch', 'navigation.launch.py')),
             condition=IfCondition(LaunchConfiguration('use_nav')),
             launch_arguments={
                 'use_sim_time': LaunchConfiguration('use_gazebo'),
@@ -107,6 +134,7 @@ def generate_launch_description():
                 'keep_out_map': LaunchConfiguration('keep_out_map'),
                 'slam': LaunchConfiguration('slam'),
                 'use_gps': LaunchConfiguration('use_gps'),
+                'robot_base': LaunchConfiguration('robot_base'),
                 'differential_steering': LaunchConfiguration('differential_steering')
             }.items()
         )
@@ -263,30 +291,7 @@ def generate_launch_description():
         ),
 
         # Robot description
-        # Is there a way to configure the urdf path using a launch config variable to avoid
-        # to cases here?
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(description_launch_path),
-            condition=UnlessCondition(LaunchConfiguration('differential_steering')),
-            launch_arguments={
-                'use_sim_time': LaunchConfiguration('use_gazebo'),
-                'publish_joints': 'false',
-                'robot_base': LaunchConfiguration('robot_base'),
-                'urdf': PathJoinSubstitution(
-                    [FindPackageShare("elsabot_robot"), "urdf/robots",  'ebot_2wd_ackermann' + f".urdf.xacro"])
-            }.items()
-        ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(description_launch_path),
-            condition=IfCondition(LaunchConfiguration('differential_steering')),
-            launch_arguments={
-                'use_sim_time': LaunchConfiguration('use_gazebo'),
-                'publish_joints': 'false',
-                'robot_base': LaunchConfiguration('robot_base'),
-                'urdf': PathJoinSubstitution(
-                    [FindPackageShare("elsabot_robot"), "urdf/robots",  'ebot_2wd_differential' + f".urdf.xacro"])
-            }.items()
-        ),
+        OpaqueFunction(function=get_description_launch),
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(sensors_launch_path),
@@ -296,12 +301,13 @@ def generate_launch_description():
             }.items()
         ),
 
+        # Fix condition this based on base type (jeep, etc)
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(joy_launch_path),
             condition=IfCondition(LaunchConfiguration('joy')),
-            # Remap the output according to the cmd_vel_mux config
             launch_arguments={
-                # map from: to
+                'robot_base': LaunchConfiguration('robot_base'),
+                # Remap the output according to the cmd_vel_mux config
                 'cmd_vel_topic': 'cmd_vel/joy'
             }.items()
         ),
@@ -320,7 +326,6 @@ def generate_launch_description():
             output='screen',
             parameters=[{'cal_value': 367, 'current_lsb': 0.0002}]
         ),
-
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
