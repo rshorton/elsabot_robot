@@ -112,6 +112,8 @@ def generate_launch_description():
                 nav_yaml = nav2_config_path_base_ackermann
 
         #nav_yaml = nav2_config_path_base
+        
+        logger.info('prepare_nav_launch: Using config yaml: {}'.format(nav_yaml))
 
         # Determine the Nav2 BT tree to use based on the specified nav mode.
         nav_through_poses_bt_xml = nav2_bt_through_poses_xml_path
