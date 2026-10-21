@@ -67,7 +67,7 @@
 
   <!-- Fix - check pitch angle and y offset -->
   <xacro:property name="tof_sensor_front_left_pose">
-    <origin xyz="${0.530 + base_link_x_offset_to_center} 0.013 ${0.095 + base_link_z_offset_to_center}" rpy="0 ${M_PI*12.0/180.0} ${M_PI*30.0/180.0}"/>
+    <origin xyz="${0.530 + base_link_x_offset_to_center} 0.013 ${0.095 + base_link_z_offset_to_center}" rpy="0 ${M_PI*14.0/180.0} ${M_PI*30.0/180.0}"/>
   </xacro:property>
 
   <xacro:property name="tof_sensor_front_right_pose">
